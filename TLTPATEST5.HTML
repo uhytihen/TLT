@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>TTL PA TV - HỆ THỐNG THÔNG BÁO CHUYẾN XE</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; overflow: hidden; }
+        header { background: #1a1a1a; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #f39c12; }
+        .logo { font-size: 2.5em; font-weight: 800; color: #fff; }
+        .clock { font-size: 2.8em; color: #f39c12; font-family: 'Courier New', monospace; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background: #2c3e50; color: #95a5a6; padding: 15px 20px; text-align: left; text-transform: uppercase; font-size: 1.1em; border-bottom: 3px solid #444; }
+        td { padding: 20px; border-bottom: 1px solid #222; font-size: 1.8em; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .col-bien { color: #f1c40f; font-family: 'Courier New', monospace; }
+        .col-loai { color: #3498db; font-style: italic; font-size: 0.8em; }
+        
+        /* Trạng thái */
+        .status-sap-chay { color: #2ecc71; animation: blink 1s infinite; }
+        .status-da-di { color: #7f8c8d; opacity: 0.5; }
+        .status-huy { color: #e74c3c; }
+        .status-mac-dinh { color: #2ecc71; }
+        
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        
+        .footer { position: fixed; bottom: 0; width: 100%; background: #c0392b; padding: 15px; font-size: 1.5em; font-weight: bold; text-align: center; }
+        #loading { padding: 50px; text-align: center; font-size: 2em; color: #f39c12; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">TTL PA TV - LỊCH TRÌNH CHUYẾN XE</div>
+    <div class="clock" id="liveClock">00:00:00</div>
+</header>
+
+<div id="loading">ĐANG KẾT NỐI DỮ LIỆU...</div>
+
+<table id="busTable" style="display: none;">
+    <thead>
+        <tr>
+            <th style="width: 12%;">Giờ Đi</th>
+            <th style="width: 18%;">Biển Số</th>
+            <th style="width: 30%;">Điểm Đến</th>
+            <th style="width: 22%;">Loại Xe</th>
+            <th style="width: 18%;">Trạng Thái</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="footer">Quý khách vui lòng có mặt trước 15 phút. Chúc quý khách một chuyến đi an toàn!</div>
+
+<script>
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRds4ijj_aHtKjjJ7NyiaSLWUzovW6Ds1H58czJNHr8OjSDa-6KY5PMuBsBmYNDy9vmdRe1gS57jx-F/pub?gid=0&single=true&output=csv';
+
+    // Hàm bóc tách CSV chuẩn (Xử lý được dấu ngoặc kép)
+    function parseCSV(text) {
+        const rows = [];
+        let curRow = [];
+        let curCell = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            let nextChar = text[i+1];
+
+            if (char === '"' && inQuotes && nextChar === '"') { curCell += '"'; i++; }
+            else if (char === '"') { inQuotes = !inQuotes; }
+            else if (char === ',' && !inQuotes) { curRow.push(curCell.trim()); curCell = ''; }
+            else if (char === '\n' && !inQuotes) { curRow.push(curCell.trim()); rows.push(curRow); curRow = []; curCell = ''; }
+            else if (char !== '\r') { curCell += char; }
+        }
+        if (curCell || curRow.length > 0) { curRow.push(curCell.trim()); rows.push(curRow); }
+        return rows;
+    }
+
+    async function updateData() {
+        try {
+            // Thêm tham số ngẫu nhiên để buộc làm mới dữ liệu
+            const response = await fetch(CSV_URL + '&nocache=' + new Date().getTime());
+            if (!response.ok) throw new Error('Không thể tải file');
+            
+            const text = await response.text();
+            const data = parseCSV(text);
+            
+            let html = '';
+            // Bỏ qua dòng tiêu đề i=0
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (row.length < 5 || !row[0]) continue;
+
+                let sClass = 'status-mac-dinh';
+                if (row[4].includes('Sắp khởi hành')) sClass = 'status-sap-chay';
+                else if (row[4].includes('Đã xuất phát')) sClass = 'status-da-di';
+                else if (row[4].includes('Bị hủy')) sClass = 'status-huy';
+
+                html += `<tr>
+                    <td>${row[0]}</td>
+                    <td class="col-bien">${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td class="col-loai">${row[3]}</td>
+                    <td class="${sClass}">${row[4]}</td>
+                </tr>`;
+            }
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('busTable').style.display = 'table';
+            document.querySelector('#busTable tbody').innerHTML = html;
+        } catch (error) {
+            console.error('Lỗi:', error);
+            document.getElementById('loading').innerText = 'LỖI KẾT NỐI: VUI LÒNG KIỂM TRA MẠNG';
+        }
+    }
+
+    // Đồng hồ
+    setInterval(() => {
+        document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+    }, 1000);
+
+    // Cập nhật dữ liệu
+    updateData();
+    setInterval(updateData, 15000); // Tự động cập nhật mỗi 15 giây
+</script>
+</body>
+</html>
