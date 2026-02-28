@@ -2,37 +2,80 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>TTL PA TV - THÔNG TIN CHUYẾN XE SONG NGỮ</title>
+    <title>TTL PA TV - MÀN HÌNH THÔNG BÁO 48 INCH</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; overflow: hidden; transition: opacity 0.8s ease-in-out; }
-        header { background: #1a1a1a; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #f39c12; }
-        .logo { font-size: 2.5em; font-weight: 800; }
-        .clock { font-size: 2.8em; color: #f39c12; font-family: 'Courier New', monospace; font-weight: bold; }
+        body { 
+            background-color: #000; 
+            color: #fff; 
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif; 
+            margin: 0; 
+            padding: 0;
+            overflow: hidden; 
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        /* Header khổng lồ cho màn hình lớn */
+        header { 
+            background: #1a1a1a; 
+            padding: 30px 50px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 8px solid #f39c12; 
+        }
+        .logo { font-size: 4em; font-weight: 900; letter-spacing: 2px; }
+        .clock { font-size: 4.5em; color: #f39c12; font-family: 'Courier New', monospace; font-weight: bold; }
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: #2c3e50; color: #95a5a6; padding: 15px 20px; text-align: left; text-transform: uppercase; font-size: 1.2em; border-bottom: 3px solid #444; }
-        td { padding: 20px; border-bottom: 1px solid #222; font-size: 1.8em; font-weight: bold; }
         
-        /* ĐỊNH DẠNG CÁC CỘT */
-        .col-bien { color: #f1c40f; font-family: 'Courier New', monospace; }
-        
-        /* FIX LỖI CHỮ NHỎ Ở CỘT LOẠI XE */
-        .col-loai { 
-            color: #3498db; 
-            font-size: 1.7em; /* Tăng kích thước tương đương các cột khác */
-            font-style: normal; /* Bỏ in nghiêng để chữ rõ nét hơn */
-            width: 22%; 
+        /* Tiêu đề cột */
+        th { 
+            background: #2c3e50; 
+            color: #bdc3c7; 
+            padding: 25px; 
+            text-align: left; 
+            text-transform: uppercase; 
+            font-size: 2em; /* Tiêu đề cột cực lớn */
+            border-bottom: 5px solid #444; 
+        }
+
+        /* Nội dung từng dòng xe */
+        td { 
+            padding: 35px 25px; /* Tăng khoảng cách hàng */
+            border-bottom: 2px solid #222; 
+            font-size: 3em; /* Chữ nội dung siêu lớn cho màn hình 48 inch */
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
-        /* TRẠNG THÁI */
+        /* Màu sắc định danh */
+        .col-gio { color: #ffffff; width: 12%; }
+        .col-bien { color: #f1c40f; font-family: 'Courier New', monospace; width: 18%; }
+        .col-tuyen { color: #ffffff; text-transform: uppercase; width: 30%; }
+        .col-loai { color: #3498db; width: 22%; }
+        .col-trangthai { width: 18%; }
+        
+        /* Trạng thái xe */
         .status-sap-chay { color: #2ecc71; animation: blink 1s infinite; }
-        .status-da-di { color: #7f8c8d; opacity: 0.5; }
+        .status-da-di { color: #7f8c8d; opacity: 0.4; }
         .status-huy { color: #e74c3c; }
         .status-dung-gio { color: #2ecc71; }
         
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
         
-        .footer { position: fixed; bottom: 0; width: 100%; background: #c0392b; padding: 15px; font-size: 1.5em; font-weight: bold; text-align: center; }
+        /* Thanh thông báo dưới chân */
+        .footer { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: #c0392b; 
+            padding: 25px; 
+            font-size: 2.5em; 
+            font-weight: bold; 
+            text-align: center; 
+        }
     </style>
 </head>
 <body>
@@ -124,17 +167,16 @@
             else if (statusText.includes('Đúng giờ')) sClass = 'status-dung-gio';
 
             html += `<tr>
-                <td>${row[0]}</td>
+                <td class="col-gio">${row[0]}</td>
                 <td class="col-bien">${row[1]}</td>
-                <td>${row[2]}</td>
+                <td class="col-tuyen">${row[2]}</td>
                 <td class="col-loai">${row[3]}</td>
-                <td class="${sClass}">${displayStatus}</td>
+                <td class="col-trangthai ${sClass}">${displayStatus}</td>
             </tr>`;
         }
         document.querySelector('#busTable tbody').innerHTML = html;
     }
 
-    // Chuyển đổi ngôn ngữ mỗi 10 giây (kèm hiệu ứng mờ)
     setInterval(() => {
         document.body.style.opacity = 0;
         setTimeout(() => {
@@ -144,7 +186,6 @@
         }, 800);
     }, 10000);
 
-    // Đồng hồ thời gian thực
     setInterval(() => {
         document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('vi-VN', { hour12: false });
     }, 1000);
