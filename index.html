@@ -2,23 +2,29 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>TTL PA TV - CHUYẾN XE SONG NGỮ</title>
+    <title>TTL PA TV - THÔNG TIN CHUYẾN XE SONG NGỮ</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; overflow: hidden; }
+        body { background-color: #000; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; overflow: hidden; transition: opacity 0.8s ease-in-out; }
         header { background: #1a1a1a; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #f39c12; }
         .logo { font-size: 2.5em; font-weight: 800; }
         .clock { font-size: 2.8em; color: #f39c12; font-family: 'Courier New', monospace; font-weight: bold; }
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: #2c3e50; color: #95a5a6; padding: 15px 20px; text-align: left; text-transform: uppercase; font-size: 1.2em; border-bottom: 3px solid #444; transition: 0.5s; }
-        td { padding: 20px; border-bottom: 1px solid #222; font-size: 1.8em; font-weight: bold; transition: 0.5s; }
+        th { background: #2c3e50; color: #95a5a6; padding: 15px 20px; text-align: left; text-transform: uppercase; font-size: 1.2em; border-bottom: 3px solid #444; }
+        td { padding: 20px; border-bottom: 1px solid #222; font-size: 1.8em; font-weight: bold; }
         
+        /* ĐỊNH DẠNG CÁC CỘT */
         .col-bien { color: #f1c40f; font-family: 'Courier New', monospace; }
-        .col-loai { color: #3498db; font-style: italic; font-size: 0.8em; }
         
-        /* Hiệu ứng chuyển đổi ngôn ngữ mượt mà */
-        .fade { opacity: 0; transform: translateY(5px); }
+        /* FIX LỖI CHỮ NHỎ Ở CỘT LOẠI XE */
+        .col-loai { 
+            color: #3498db; 
+            font-size: 1.7em; /* Tăng kích thước tương đương các cột khác */
+            font-style: normal; /* Bỏ in nghiêng để chữ rõ nét hơn */
+            width: 22%; 
+        }
         
+        /* TRẠNG THÁI */
         .status-sap-chay { color: #2ecc71; animation: blink 1s infinite; }
         .status-da-di { color: #7f8c8d; opacity: 0.5; }
         .status-huy { color: #e74c3c; }
@@ -54,10 +60,9 @@
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRds4ijj_aHtKjjJ7NyiaSLWUzovW6Ds1H58czJNHr8OjSDa-6KY5PMuBsBmYNDy9vmdRe1gS57jx-F/pub?gid=0&single=true&output=csv';
 
-    let currentLang = 'vi'; // vi hoặc en
+    let currentLang = 'vi';
     let rawData = [];
 
-    // Từ điển dịch thuật
     const langData = {
         vi: {
             title: "TTL PA TV - LỊCH TRÌNH CHUYẾN XE",
@@ -99,8 +104,6 @@
 
     function renderTable() {
         const lang = langData[currentLang];
-        
-        // Cập nhật Tiêu đề, Header và Footer
         document.getElementById('header-title').innerText = lang.title;
         document.getElementById('footer-text').innerText = lang.footer;
         const ths = document.querySelectorAll('#table-head th');
@@ -112,7 +115,7 @@
             if (row.length < 5 || !row[0]) continue;
 
             let statusText = row[4];
-            let displayStatus = lang.states[statusText] || statusText; // Dịch trạng thái nếu có trong từ điển
+            let displayStatus = lang.states[statusText] || statusText;
             
             let sClass = '';
             if (statusText.includes('Sắp khởi hành')) sClass = 'status-sap-chay';
@@ -131,24 +134,23 @@
         document.querySelector('#busTable tbody').innerHTML = html;
     }
 
-    // Chuyển đổi ngôn ngữ mỗi 10 giây
+    // Chuyển đổi ngôn ngữ mỗi 10 giây (kèm hiệu ứng mờ)
     setInterval(() => {
-        const body = document.body;
-        body.style.opacity = 0.5; // Hiệu ứng mờ nhẹ khi chuyển
+        document.body.style.opacity = 0;
         setTimeout(() => {
             currentLang = (currentLang === 'vi') ? 'en' : 'vi';
             renderTable();
-            body.style.opacity = 1;
-        }, 3000);
+            document.body.style.opacity = 1;
+        }, 800);
     }, 10000);
 
-    // Đồng hồ
+    // Đồng hồ thời gian thực
     setInterval(() => {
         document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('vi-VN', { hour12: false });
     }, 1000);
 
     fetchData();
-    setInterval(fetchData, 30000); // Lấy dữ liệu mới từ Sheets mỗi 30 giây
+    setInterval(fetchData, 30000);
 </script>
 </body>
 </html>
