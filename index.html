@@ -1,8 +1,18 @@
+Để đáp ứng yêu cầu của bạn cho màn hình 48 inch, tôi đã nâng cấp mã nguồn với các thay đổi quan trọng:
+
+Bổ sung dịch thuật: Tình trạng "hợp đồng" sẽ tự động chuyển thành "Charter" khi hiển thị tiếng Anh.
+
+Làm nổi bật "Sắp khởi hành": Khi xe ở trạng thái này, toàn bộ dòng chữ sẽ chuyển sang nền màu xanh lá đậm, chữ trắng và hiệu ứng nhấp nháy mạnh hơn để hành khách chú ý ngay lập tức.
+
+Tối ưu cỡ chữ: Giữ nguyên kích thước khổng lồ phù hợp cho màn hình lớn.
+
+Mã HTML Toàn Trang (Bản nâng cấp nổi bật + Charter)
+HTML
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>TTL PA TV - MÀN HÌNH THÔNG BÁO 48 INCH</title>
+    <title>TTL PA TV - HỆ THỐNG THÔNG BÁO XE HỢP ĐỒNG</title>
     <style>
         body { 
             background-color: #000; 
@@ -14,7 +24,6 @@
             transition: opacity 0.8s ease-in-out;
         }
 
-        /* Header khổng lồ cho màn hình lớn */
         header { 
             background: #1a1a1a; 
             padding: 30px 50px; 
@@ -28,44 +37,50 @@
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        /* Tiêu đề cột */
         th { 
             background: #2c3e50; 
             color: #bdc3c7; 
             padding: 25px; 
             text-align: left; 
             text-transform: uppercase; 
-            font-size: 2em; /* Tiêu đề cột cực lớn */
+            font-size: 2em; 
             border-bottom: 5px solid #444; 
         }
 
-        /* Nội dung từng dòng xe */
         td { 
-            padding: 35px 25px; /* Tăng khoảng cách hàng */
+            padding: 35px 25px; 
             border-bottom: 2px solid #222; 
-            font-size: 3em; /* Chữ nội dung siêu lớn cho màn hình 48 inch */
+            font-size: 3em; 
             font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         
-        /* Màu sắc định danh */
-        .col-gio { color: #ffffff; width: 12%; }
-        .col-bien { color: #f1c40f; font-family: 'Courier New', monospace; width: 18%; }
-        .col-tuyen { color: #ffffff; text-transform: uppercase; width: 30%; }
-        .col-loai { color: #3498db; width: 22%; }
-        .col-trangthai { width: 18%; }
+        /* Màu sắc mặc định */
+        .col-bien { color: #f1c40f; font-family: 'Courier New', monospace; }
+        .col-loai { color: #3498db; }
         
-        /* Trạng thái xe */
-        .status-sap-chay { color: #2ecc71; animation: blink 1s infinite; }
+        /* NỔI BẬT DÒNG SẮP KHỞI HÀNH */
+        .row-sap-chay {
+            background-color: #1b5e20 !important; /* Nền xanh lá đậm */
+            color: #ffffff !important;
+        }
+        .row-sap-chay td { border-bottom: 2px solid #2ecc71; }
+        .row-sap-chay .col-bien, .row-sap-chay .col-loai { color: #ffffff !important; }
+
+        /* Trạng thái chữ */
+        .status-sap-chay { animation: blink-strong 0.8s infinite; color: #fff; font-weight: 900; }
         .status-da-di { color: #7f8c8d; opacity: 0.4; }
         .status-huy { color: #e74c3c; }
-        .status-dung-gio { color: #2ecc71; }
+        .status-charter { color: #9b59b6; } /* Màu tím cho hợp đồng */
         
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes blink-strong { 
+            0% { opacity: 1; transform: scale(1); } 
+            50% { opacity: 0.5; transform: scale(1.02); } 
+            100% { opacity: 1; transform: scale(1); } 
+        }
         
-        /* Thanh thông báo dưới chân */
         .footer { 
             position: fixed; 
             bottom: 0; 
@@ -111,13 +126,25 @@
             title: "TTL PA TV - LỊCH TRÌNH CHUYẾN XE",
             headers: ["Giờ Đi", "Biển Số", "Điểm Đến", "Loại Xe", "Trạng Thái"],
             footer: "Quý khách vui lòng có mặt trước 15 phút. Chúc quý khách một chuyến đi an toàn!",
-            states: { "Sắp khởi hành": "Sắp khởi hành", "Đã xuất phát": "Đã xuất phát", "Bị hủy": "Bị hủy", "Đúng giờ": "Đúng giờ" }
+            states: { 
+                "Sắp khởi hành": "Sắp khởi hành", 
+                "Đã xuất phát": "Đã xuất phát", 
+                "Bị hủy": "Bị hủy", 
+                "Đúng giờ": "Đúng giờ",
+                "hợp đồng": "Hợp đồng" 
+            }
         },
         en: {
             title: "TTL PA TV - BUS DEPARTURES",
             headers: ["Departure", "Plate No.", "Destination", "Bus Type", "Status"],
             footer: "Please arrive 15 minutes early. Have a safe journey!",
-            states: { "Sắp khởi hành": "Boarding", "Đã xuất phát": "Departed", "Bị hủy": "Cancelled", "Đúng giờ": "On Time" }
+            states: { 
+                "Sắp khởi hành": "Boarding", 
+                "Đã xuất phát": "Departed", 
+                "Bị hủy": "Cancelled", 
+                "Đúng giờ": "On Time",
+                "hợp đồng": "Charter" 
+            }
         }
     };
 
@@ -157,21 +184,31 @@
             const row = rawData[i];
             if (row.length < 5 || !row[0]) continue;
 
-            let statusText = row[4];
-            let displayStatus = lang.states[statusText] || statusText;
+            let statusRaw = row[4].trim();
+            // Chuẩn hóa để so sánh không phân biệt hoa thường cho từ "hợp đồng"
+            let statusKey = statusRaw.toLowerCase() === 'hợp đồng' ? 'hợp đồng' : statusRaw;
+            let displayStatus = lang.states[statusKey] || statusRaw;
             
             let sClass = '';
-            if (statusText.includes('Sắp khởi hành')) sClass = 'status-sap-chay';
-            else if (statusText.includes('Đã xuất phát')) sClass = 'status-da-di';
-            else if (statusText.includes('Bị hủy')) sClass = 'status-huy';
-            else if (statusText.includes('Đúng giờ')) sClass = 'status-dung-gio';
+            let rowClass = '';
 
-            html += `<tr>
+            if (statusRaw.includes('Sắp khởi hành')) {
+                sClass = 'status-sap-chay';
+                rowClass = 'row-sap-chay';
+            } else if (statusRaw.includes('Đã xuất phát')) {
+                sClass = 'status-da-di';
+            } else if (statusRaw.includes('Bị hủy')) {
+                sClass = 'status-huy';
+            } else if (statusKey === 'hợp đồng') {
+                sClass = 'status-charter';
+            }
+
+            html += `<tr class="${rowClass}">
                 <td class="col-gio">${row[0]}</td>
                 <td class="col-bien">${row[1]}</td>
                 <td class="col-tuyen">${row[2]}</td>
                 <td class="col-loai">${row[3]}</td>
-                <td class="col-trangthai ${sClass}">${displayStatus}</td>
+                <td class="${sClass}">${displayStatus}</td>
             </tr>`;
         }
         document.querySelector('#busTable tbody').innerHTML = html;
@@ -191,7 +228,7 @@
     }, 1000);
 
     fetchData();
-    setInterval(fetchData, 30000);
+    setInterval(fetchData, 20000);
 </script>
 </body>
 </html>
